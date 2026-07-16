@@ -1,0 +1,22 @@
+# Virtual environments
+env/
+env312/
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Vector database (optional if very large)
+vector_store.pkl
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
