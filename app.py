@@ -105,29 +105,26 @@ TOPIC_QUESTIONS = {
         "How can epilepsy be diagnosed and managed?",
     ],
 
-    "🦴 Orthopedics": [
+     "🦴 Orthopedics": [
         "What are the most common sports injuries?",
         "How do I treat a broken bone?",
         "What causes back pain and how can it be managed?",
         "How can I prevent osteoporosis?",
     ],
 
-    
-    "💊 Pharmacology ": [
+     "💊 Pharmacology ": [
         "What are the side effects of Paracetamol?",
         "How do antibiotics work?",
         "How do vaccines stimulate immunity?",
         "Which drugs are used for hypertension?",
     ],
 
-
-"🧬 Pathology": [
+    "🧬 Pathology": [
     "What is inflammation and what are its types?",
     "What is the difference between benign and malignant tumors?",
     "What causes anemia and how is it classified?",
     "What is necrosis and how does it differ from apoptosis?",
-],
-
+    ],
 }
 
 GENERAL_EXAMPLE_QUESTIONS = [
@@ -289,6 +286,19 @@ current_messages = current_chat_data["messages"]
 
 show_welcome = (not current_messages) or current_chat_data.get("show_welcome", False)
 
+
+def route_question_to_chat(q, topic_title=None):
+    """Send a clicked question to a NEW chat if the active chat already
+    has a conversation in it, so different topics never mix in one thread."""
+    if st.session_state.chats[st.session_state.current_chat]["messages"]:
+        new_id = max(st.session_state.chats.keys()) + 1
+        st.session_state.chats[new_id] = new_chat_dict()
+        st.session_state.current_chat = new_id
+
+    st.session_state.chats[st.session_state.current_chat]["show_welcome"] = False
+    st.session_state.pending_question = q
+    st.session_state.pending_topic_title = topic_title
+
 # ===============================
 # Welcome screen (topics + example questions)
 # ===============================
@@ -315,10 +325,8 @@ if show_welcome:
         for i, q in enumerate(TOPIC_QUESTIONS[topic]):
             with q_cols[i % 2]:
                 if st.button(q, key=f"sugg_{topic}_{i}", use_container_width=True):
-                    st.session_state.pending_question = q
-                    st.session_state.pending_topic_title = topic.split(" ", 1)[1]  # strip emoji
+                    route_question_to_chat(q, topic_title=topic.split(" ", 1)[1])  # strip emoji
                     st.session_state.selected_topic = None
-                    current_chat_data["show_welcome"] = False
                     st.rerun()
 
     else:
@@ -340,8 +348,7 @@ if show_welcome:
         for i, q in enumerate(GENERAL_EXAMPLE_QUESTIONS):
             with ex_cols[i % 2]:
                 if st.button(q, key=f"ex_{i}", use_container_width=True):
-                    st.session_state.pending_question = q
-                    current_chat_data["show_welcome"] = False
+                    route_question_to_chat(q)
                     st.rerun()
 
     st.info(
