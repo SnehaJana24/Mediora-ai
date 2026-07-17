@@ -10,10 +10,22 @@ from prompts import SYSTEM_PROMPT
 
 load_dotenv()
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+api_key = os.getenv("GEMINI_API_KEY")
 model = os.getenv("GEMINI_GEN_MODEL")
+if not api_key:
+    st.error("❌ GEMINI_API_KEY not found.")
+    st.stop()
 
-vector_db = joblib.load("vector_store.pkl")
+@st.cache_resource
+def load_client():
+    return genai.Client(api_key=api_key)
+
+client = load_client()
+@st.cache_resource
+def load_vector_db():
+    return joblib.load("vector_store.pkl")
+
+vector_db = load_vector_db()
 
 st.set_page_config(
     page_title="Mediora AI",
@@ -241,7 +253,10 @@ with st.sidebar:
 
             st.markdown("---")
 
-    st.info("Educational Purposes Only")
+    st.info(
+    "This assistant provides educational information only.\n\n"
+    "Always consult a qualified healthcare professional for diagnosis or treatment."
+)
 
 
 st.markdown("""
@@ -343,7 +358,7 @@ else:
                 st.markdown(message["content"])
 
 
-question = st.chat_input("Ask your medical question...")
+question = st.chat_input("Ask your health related question...")
 
 # a click on a topic/example question acts the same as typing it
 if st.session_state.pending_question:
@@ -368,13 +383,29 @@ if question:
             question, topic_name=st.session_state.pending_topic_title
         )
     st.session_state.pending_topic_title = None
+    SIMILARITY_THRESHOLD = 0.45
 
     results = search(question, vector_db, top_k=3)
-
+    
     context = ""
-    for score, text in results:
-        context += f"\n[Similarity: {score:.3f}]\n{text}\n"
 
+    for score, text in results:
+      
+       
+       if score >= SIMILARITY_THRESHOLD:
+          context += text + "\n\n"
+    if context.strip() == "":
+       answer = (
+    "⚠️ Sorry, I couldn't find relevant information for this question "
+    "in the current medical knowledge base."
+)
+
+       chat_data["messages"].append({
+           "role": "assistant",
+           "content": answer
+        })
+
+       st.rerun()
     prompt = SYSTEM_PROMPT.format(
         context=context,
         question=question
@@ -390,13 +421,30 @@ if question:
     except Exception as e:
         print("Gemini Error:", e)
         if "503" in str(e):
-            answer = "⚠️ Gemini server is currently busy. Please try again in a few seconds."
+
+          answer = (
+        "⚠️ Gemini AI is currently unavailable.\n\n"
+        "Relevant information was found in the medical knowledge base, "
+        "but it cannot be summarized right now.\n\n"
+        "Please try again in a few moments."
+          )
+
+          
+
         elif "429" in str(e):
-            answer = "⚠️ AI service is temporarily unavailable because the free API quota has been reached."
+
+            answer = (
+                "⚠️ Free Gemini API quota has been exhausted.\n\n"
+        "Please try again later or use a new API key."
+            )
+
+            
         elif "ConnectError" in str(e):
             answer = "⚠️ Unable to connect to Gemini. Please check your internet connection."
         else:
-            answer = f"Error: {e}"
+           print(e)
+
+           answer = "⚠️ Something went wrong. Please try again."
 
     chat_data["messages"].append(
         {

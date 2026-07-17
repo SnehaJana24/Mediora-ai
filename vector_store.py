@@ -73,7 +73,7 @@ def search(query, vector_store, top_k=5):
     filtered = []
 
     for score, text in scores:
-       if score > 0.40:
+       if score >0.45:
            filtered.append((score, text))
 
     return filtered[:top_k]
