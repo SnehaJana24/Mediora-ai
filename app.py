@@ -97,34 +97,6 @@ TOPIC_QUESTIONS = {
         "What prenatal vitamins are recommended?",
         "What are signs of a healthy pregnancy?",
     ],
-
-    "🧠 Neurology": [
-        "What are the early signs of a stroke?",
-        "What causes frequent migraines and how are they treated?",
-        "What are the symptoms of Parkinson's disease?",
-        "How can epilepsy be diagnosed and managed?",
-    ],
-
-     "🦴 Orthopedics": [
-        "What are the most common sports injuries?",
-        "How do I treat a broken bone?",
-        "What causes back pain and how can it be managed?",
-        "How can I prevent osteoporosis?",
-    ],
-
-     "💊 Pharmacology ": [
-        "What are the side effects of Paracetamol?",
-        "How do antibiotics work?",
-        "How do vaccines stimulate immunity?",
-        "Which drugs are used for hypertension?",
-    ],
-
-    "🧬 Pathology": [
-    "What is inflammation and what are its types?",
-    "What is the difference between benign and malignant tumors?",
-    "What causes anemia and how is it classified?",
-    "What is necrosis and how does it differ from apoptosis?",
-    ],
 }
 
 GENERAL_EXAMPLE_QUESTIONS = [
