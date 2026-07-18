@@ -18,7 +18,7 @@ embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def extract_text_from_all_pdfs():
 
-    docs_folder = "Docs"
+    docs_folder = "docs"
 
     all_text = ""
 
