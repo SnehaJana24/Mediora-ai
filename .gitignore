@@ -11,8 +11,6 @@ __pycache__/
 # Environment variables
 .env
 
-# Vector database (optional if very large)
-vector_store.pkl
 
 # VS Code
 .vscode/
